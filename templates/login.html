@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/styles.css') }}">
+</head>
+<body>
+    <div class="container">
+        <div class="login-container">
+            <div class="login-form">
+                <img src="https://upload.wikimedia.org/wikipedia/commons/a/ac/Nu_logo.png" alt="Nu Logo" class="logo">
+                <h2>Qué gusto verte de nuevo</h2>
+                <form>
+                    <label for="email">Correo electrónico</label>
+                    <input type="email" id="email" placeholder="Ingresa tu correo" required>
+                    
+                    <label for="password">Contraseña</label>
+                    <input type="password" id="password" placeholder="Ingresa tu contraseña" required>
+                    
+                    <button type="submit">Iniciar sesión</button>
+                </form>
+                <p>¿Aún no tienes cuenta? <a href="#">Regístrate aquí</a></p>
+            </div>
+            <div class="login-banner">
+                <h1>Curso de Educación Financiera de Condusef y Academia Nu</h1>
+                <p>Libérate del estrés financiero.</p>
+            </div>
+        </div>
+    </div>
+</body>
+</html>
