@@ -20,7 +20,7 @@ def generate_unique_id_token():
     return ''.join(random.choices(string.ascii_uppercase + string.digits, k=9))
 # Configuración de conexión a PostgreSQL
 load_dotenv()
-app.config['SQLALCHEMY_DATABASE_URI'] = os.getenv("DATABASE_URL")
+app.config['SQLALCHEMY_DATABASE_URI'] = os.getenv("SQLALCHEMY_DATABASE_URI")
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 app.config['SECRET_KEY'] = os.getenv('SECRET_KEY')  
 # Inicializar SQLAlchemy
