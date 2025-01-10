@@ -17,3 +17,7 @@ argon2-cffi-bindings==21.2.0
 pycparser==2.22 
 PyJWT==2.10.1 
 python-dotenv==1.0.1
+packaging==24.2
+cffi==1.17.1
+greenlet==3.1.1
+
