@@ -196,6 +196,26 @@ def register_sale():
         db.session.rollback()
         print("Error saving sale:", e)
         return jsonify({'error': 'Failed to register sale'}), 500
+        
+@app.route('/webhook', methods=['POST'])
+def stripe_webhook():
+    payload = request.get_data(as_text=True)
+    sig_header = request.headers.get('Stripe-Signature')
+
+    try:
+        # Verificación de la firma del webhook
+        event = stripe.Webhook.construct_event(payload, sig_header, WEBHOOK_SECRET)
+    except ValueError:
+        return jsonify({'error': 'Invalid payload'}), 400
+    except stripe.error.SignatureVerificationError:
+        return jsonify({'error': 'Invalid signature'}), 400
+
+    # Verificar el tipo de evento recibido
+    if event['type'] == 'checkout.session.completed':
+        session = event['data']['object']
+        user_id = session['metadata']['user_id']  # Obtener el user_id de los metadatos
+
+    return jsonify({'status': 'success'}), 200
 
 @app.route('/get-sales', methods=['GET'])
 def get_sales():
