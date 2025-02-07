@@ -387,7 +387,11 @@ def validate_promo():
     else:
         return jsonify({'error': 'Código promocional incorrecto'}), 400
 
-
+@app.route('/webhook', methods=['POST'])
+def stripe_webhook():
+    payload = request.get_data(as_text=True)
+    print(f"Webhook recibido: {payload}")
+    return '', 200  
 
 @app.route('/api/promo-status/<int:user_id>', methods=['GET'])
 def promo_status(user_id):
