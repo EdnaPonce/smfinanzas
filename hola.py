@@ -395,7 +395,7 @@ def stripe_webhook():
     sig_header = request.headers.get('Stripe-Signature')
 
     try:
-        event = json.loads(payload)
+        event = json.loads(payload)  # Usa json.loads para convertir el payload a un diccionario
 
         if event['type'] == 'checkout.session.completed':
             session = event['data']['object']
@@ -412,7 +412,7 @@ def stripe_webhook():
 
     except Exception as e:
         print(f"❌ Error en webhook: {str(e)}")
-        return '', 400 
+        return '', 400
 
 @app.route('/api/promo-status/<int:user_id>', methods=['GET'])
 def promo_status(user_id):
