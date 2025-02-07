@@ -49,7 +49,7 @@ EMAIL_FROM = os.getenv('EMAIL_FROM')
 
 # Inicializar PasswordHasher
 ph = PasswordHasher()
-
+STRIPE_WEBHOOK_SECRET = os.getenv("STRIPE_WEBHOOK_SECRET")  # O directamente la clave
 # Modelo para la tabla existente (ajusta según tus columnas)
 class User(db.Model):
     __tablename__ = 'users'
@@ -395,7 +395,9 @@ def stripe_webhook():
     sig_header = request.headers.get('Stripe-Signature')
 
     try:
-        event = json.loads(payload)  # Usa json.loads para convertir el payload a un diccionario
+        event = stripe.Webhook.construct_event(
+            payload, sig_header, STRIPE_WEBHOOK_SECRET
+        )
 
         if event['type'] == 'checkout.session.completed':
             session = event['data']['object']
@@ -410,10 +412,13 @@ def stripe_webhook():
 
         return '', 200
 
+    except stripe.error.SignatureVerificationError as e:
+        print(f"❌ Error en la verificación de la firma del webhook: {str(e)}")
+        return '', 400
+
     except Exception as e:
         print(f"❌ Error en webhook: {str(e)}")
         return '', 400
-
 @app.route('/api/promo-status/<int:user_id>', methods=['GET'])
 def promo_status(user_id):
     user = User.query.get(user_id)
