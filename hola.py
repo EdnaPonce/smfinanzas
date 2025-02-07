@@ -394,10 +394,11 @@ def stripe_webhook():
     payload = request.get_data(as_text=True)
     
     try:
-        event = json.loads(payload)  # Solo parseamos el JSON sin validar la firma
+        event = json.loads(payload)  # Convertir el JSON recibido a un diccionario
+        print(f"📡 Webhook recibido: {json.dumps(event, indent=2)}")  # Agregar log para ver el contenido
 
         if event['type'] == 'checkout.session.completed':
-            session = event['data']['object']
+            session = event.get('data', {}).get('object', {})  # Evita acceder a índices que no existen
             user_id = session.get('metadata', {}).get('user_id')
 
             if user_id:
@@ -412,6 +413,7 @@ def stripe_webhook():
     except Exception as e:
         print(f"❌ Error en webhook: {str(e)}")
         return '', 400
+
 
 @app.route('/api/promo-status/<int:user_id>', methods=['GET'])
 def promo_status(user_id):
