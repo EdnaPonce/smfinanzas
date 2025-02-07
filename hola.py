@@ -390,8 +390,27 @@ def validate_promo():
 @app.route('/webhook', methods=['POST'])
 def stripe_webhook():
     payload = request.get_data(as_text=True)
-    print(f"Webhook recibido: {payload}")
-    return '', 200  
+    sig_header = request.headers.get('Stripe-Signature')
+
+    try:
+        event = json.loads(payload)
+
+        if event['type'] == 'checkout.session.completed':
+            session = event['data']['object']
+            user_id = session.get('metadata', {}).get('user_id')
+
+            if user_id:
+                user = User.query.filter_by(id=user_id).first()
+                if user:
+                    user.pay_success = True
+                    db.session.commit()
+                    print(f"✅ Usuario {user_id} actualizado con pago exitoso")
+
+        return '', 200
+
+    except Exception as e:
+        print(f"❌ Error en webhook: {str(e)}")
+        return '', 400 
 
 @app.route('/api/promo-status/<int:user_id>', methods=['GET'])
 def promo_status(user_id):
