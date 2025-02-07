@@ -24,6 +24,8 @@ import uuid
 from sendgrid import SendGridAPIClient
 from sendgrid.helpers.mail import Mail
 from mailersend.emails import NewEmail
+import json  # Agregar esta línea
+import stripe
 
 app = Flask(__name__)
 cors_origins = os.getenv("CORS_ORIGINS", "http://localhost:3000")  # Valor por defecto si no se encuentra
