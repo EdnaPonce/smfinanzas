@@ -392,13 +392,14 @@ def validate_promo():
 @app.route('/webhook', methods=['POST'])
 def stripe_webhook():
     payload = request.get_data(as_text=True)
-    
+    print(f"📡 Webhook recibido en Flask: {payload}")  # Log de entrada
+
     try:
-        event = json.loads(payload)  # Convertir el JSON recibido a un diccionario
-        print(f"📡 Webhook recibido: {json.dumps(event, indent=2)}")  # Agregar log para ver el contenido
+        event = json.loads(payload)
+        print(f"✅ Evento recibido de Stripe: {event.get('type')}")  # Log del tipo de evento
 
         if event['type'] == 'checkout.session.completed':
-            session = event.get('data', {}).get('object', {})  # Evita acceder a índices que no existen
+            session = event.get('data', {}).get('object', {})
             user_id = session.get('metadata', {}).get('user_id')
 
             if user_id:
@@ -413,6 +414,7 @@ def stripe_webhook():
     except Exception as e:
         print(f"❌ Error en webhook: {str(e)}")
         return '', 400
+
 
 
 @app.route('/api/promo-status/<int:user_id>', methods=['GET'])
