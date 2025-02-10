@@ -392,9 +392,9 @@ def validate_promo():
 @app.route('/webhook', methods=['POST'])
 def stripe_webhook():
     payload = request.get_data(as_text=True)
-    
+
     try:
-        event = json.loads(payload)  # Convertir el JSON recibido a un diccionario
+        event = json.loads(payload)  # Convertimos el JSON recibido a un diccionario
         print(f"📡 Webhook recibido: {json.dumps(event, indent=2)}")  # Log para depuración
 
         if event['type'] == 'checkout.session.completed':
@@ -405,15 +405,22 @@ def stripe_webhook():
                 user = User.query.filter_by(id=user_id).first()
                 if user:
                     user.pay_success = True  # Marcar pago exitoso
-                    user.sale.course_price = 2199.0  # Actualizar el precio del curso
-                    db.session.commit()
-                    print(f"✅ Usuario {user_id} actualizado: pago exitoso y curso a 2199 MXN")
+
+                    # Buscar la venta asociada al comprador
+                    sale = Sale.query.filter_by(buyer_id=user.id).first()
+                    if sale:
+                        sale.course_price = 2199.0  # Actualizar el precio del curso en `sales`
+                        db.session.commit()
+                        print(f"✅ Usuario {user_id} actualizado y curso marcado en Sales a 2199 MXN")
+                    else:
+                        print(f"⚠️ No se encontró venta para buyer_id={user.id}")
 
         return '', 200
 
     except Exception as e:
         print(f"❌ Error en webhook: {str(e)}")
         return '', 400
+
 
 
 
