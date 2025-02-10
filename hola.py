@@ -392,11 +392,10 @@ def validate_promo():
 @app.route('/webhook', methods=['POST'])
 def stripe_webhook():
     payload = request.get_data(as_text=True)
-    print(f"📡 Webhook recibido en Flask: {payload}")  # Log de entrada
-
+    
     try:
-        event = json.loads(payload)
-        print(f"✅ Evento recibido de Stripe: {event.get('type')}")  # Log del tipo de evento
+        event = json.loads(payload)  # Convertir el JSON recibido a un diccionario
+        print(f"📡 Webhook recibido: {json.dumps(event, indent=2)}")  # Log para depuración
 
         if event['type'] == 'checkout.session.completed':
             session = event.get('data', {}).get('object', {})
@@ -405,15 +404,17 @@ def stripe_webhook():
             if user_id:
                 user = User.query.filter_by(id=user_id).first()
                 if user:
-                    user.pay_success = True
+                    user.pay_success = True  # Marcar pago exitoso
+                    user.sale.course_price = 2199.0  # Actualizar el precio del curso
                     db.session.commit()
-                    print(f"✅ Usuario {user_id} actualizado con pago exitoso")
+                    print(f"✅ Usuario {user_id} actualizado: pago exitoso y curso a 2199 MXN")
 
         return '', 200
 
     except Exception as e:
         print(f"❌ Error en webhook: {str(e)}")
         return '', 400
+
 
 
 
