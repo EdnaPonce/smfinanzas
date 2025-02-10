@@ -406,20 +406,26 @@ def stripe_webhook():
                 if user:
                     user.pay_success = True  # Marcar pago exitoso
 
-                    # Buscar la venta asociada al comprador
-                    sale = Sale.query.filter_by(buyer_id=user.id).first()
-                    if sale:
-                        sale.course_price = 2199.0  # Actualizar el precio del curso en `sales`
-                        db.session.commit()
-                        print(f"✅ Usuario {user_id} actualizado y curso marcado en Sales a 2199 MXN")
+                    # Verificar si el usuario tiene un vendedor asociado
+                    if user.sponsor_id:
+                        sale = Sale.query.filter_by(buyer_id=user.id).first()
+
+                        if sale:
+                            sale.course_price = 2199.0  # Actualizar precio del curso en `sales`
+                            print(f"✅ Usuario {user_id} pagó y curso marcado en Sales a 2199 MXN")
+                        else:
+                            print(f"⚠️ No se encontró venta para buyer_id={user.id}")
                     else:
-                        print(f"⚠️ No se encontró venta para buyer_id={user.id}")
+                        print(f"🔹 Usuario {user_id} no tiene un vendedor asociado, solo se marcó `pay_success = True`")
+
+                    db.session.commit()  # Guardar cambios
 
         return '', 200
 
     except Exception as e:
         print(f"❌ Error en webhook: {str(e)}")
         return '', 400
+
 
 
 
